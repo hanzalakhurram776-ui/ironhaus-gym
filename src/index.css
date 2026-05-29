@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: auto; }
+
+body {
+  margin: 0;
+  background-color: #0D0D0D;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  text-align: left;
+  border: none;
+  display: block;
+}
+
+@media (pointer: fine) {
+  * { cursor: none !important; }
+}
