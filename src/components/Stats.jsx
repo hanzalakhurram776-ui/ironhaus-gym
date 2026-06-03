@@ -1,97 +1,92 @@
-import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
-import ScrollTrigger from 'gsap/ScrollTrigger'
-import { tokens } from '../tokens'
-import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useRef, useEffect, useState } from 'react'
+import { useInView } from 'framer-motion'
 
-const STATS = [
-  { value: 2400, suffix: '+', label: 'Members' },
-  { value: 48, suffix: '', label: 'Expert Coaches' },
-  { value: 12, suffix: '', label: 'Years Training' },
-  { value: 97, suffix: '%', label: 'Retention Rate' },
+const stats = [
+  { value: 2400, suffix: '+', label: 'Active Members' },
+  { value: 43, suffix: '', label: 'Expert Coaches' },
+  { value: 10, suffix: '', label: 'Years Training' },
+  { value: 89, suffix: '%', label: 'Retention Rate' },
 ]
 
-export function Stats() {
+function CountUp({ target, suffix, inView }) {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (!inView) return
+    const duration = 2000
+    let startTime = null
+
+    const step = (timestamp) => {
+      if (startTime === null) startTime = timestamp
+      const progress = Math.min((timestamp - startTime) / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setCount(Math.floor(eased * target))
+      if (progress < 1) requestAnimationFrame(step)
+    }
+
+    requestAnimationFrame(step)
+  }, [inView, target])
+
+  return <span>{count.toLocaleString()}{suffix}</span>
+}
+
+export default function Stats() {
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-100px' })
+
   return (
     <section
-      id="stats"
+      ref={ref}
       style={{
-        backgroundColor: tokens.colors.statsBg,
-        borderTop: '1px solid rgba(255,255,255,0.05)',
-        borderBottom: '1px solid rgba(255,255,255,0.05)',
-        padding: 'clamp(48px, 7vw, 80px) clamp(20px, 5vw, 48px)',
+        borderTop: '1px solid rgba(255,255,255,0.04)',
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
+        padding: '64px 0',
       }}
     >
       <div
-        className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-4"
-        style={{ gap: '40px' }}
+        className="stats-grid"
+        style={{
+          maxWidth: 1400,
+          margin: '0 auto',
+          padding: '0 48px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 32,
+        }}
       >
-        {STATS.map((stat, i) => (
-          <StatItem key={stat.label} stat={stat} index={i} />
+        {stats.map((stat, i) => (
+          <div key={i} style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                fontWeight: 300,
+                color: '#fff',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              <CountUp target={stat.value} suffix={stat.suffix} inView={inView} />
+            </div>
+            <p
+              style={{
+                fontSize: 11,
+                textTransform: 'uppercase',
+                letterSpacing: '0.15em',
+                color: 'rgba(255,255,255,0.3)',
+                marginTop: 8,
+                fontWeight: 500,
+              }}
+            >
+              {stat.label}
+            </p>
+          </div>
         ))}
       </div>
-    </section>
-  )
-}
-
-function StatItem({ stat, index }) {
-  const numRef = useRef(null)
-  const reduced = useReducedMotion()
-
-  useEffect(() => {
-    if (reduced || !numRef.current) return
-
-    const obj = { count: 0 }
-    const tween = gsap.to(obj, {
-      count: stat.value,
-      duration: 2.2,
-      ease: 'power2.out',
-      delay: index * 0.12,
-      onUpdate: () => {
-        if (numRef.current) {
-          numRef.current.textContent = Math.round(obj.count) + stat.suffix
+      <style>{`
+        @media (max-width: 768px) {
+          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
-      },
-      scrollTrigger: {
-        trigger: numRef.current,
-        start: 'top 88%',
-        once: true,
-      },
-    })
-
-    return () => {
-      tween.scrollTrigger?.kill()
-      tween.kill()
-    }
-  }, [reduced, stat.value, stat.suffix, index])
-
-  return (
-    <div style={{ textAlign: 'center' }}>
-      <div
-        ref={numRef}
-        style={{
-          fontFamily: tokens.fonts.display,
-          fontSize: 'clamp(3rem, 6vw, 5rem)',
-          lineHeight: 1,
-          color: tokens.colors.secondary,
-          marginBottom: '10px',
-          letterSpacing: '0.02em',
-        }}
-      >
-        {reduced ? stat.value + stat.suffix : '0' + stat.suffix}
-      </div>
-      <p
-        style={{
-          fontFamily: tokens.fonts.body,
-          fontSize: '0.8125rem',
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: tokens.colors.textMuted,
-          margin: 0,
-        }}
-      >
-        {stat.label}
-      </p>
-    </div>
+      `}</style>
+    </section>
   )
 }

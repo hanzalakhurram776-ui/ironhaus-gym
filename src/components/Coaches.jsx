@@ -1,172 +1,102 @@
-import { useState } from 'react'
-import { tokens } from '../tokens'
-import { SectionReveal } from './SectionReveal'
+import { useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
 
-const COACHES = [
-  {
-    name: 'Marcus Reid',
-    specialty: 'Strength & Powerlifting',
-    bio: '10× national champion. Former Olympic training camp coach.',
-    img: tokens.images.coach1,
-  },
-  {
-    name: 'Leon Torres',
-    specialty: 'HIIT & Conditioning',
-    bio: 'Certified NSCA-CPT. 12 years of elite athletic performance coaching.',
-    img: tokens.images.coach2,
-  },
-  {
-    name: 'Aisha Patel',
-    specialty: 'Combat & Martial Arts',
-    bio: 'Muay Thai champion. Certified MMA strength and conditioning specialist.',
-    img: tokens.images.coach3,
-  },
+const coaches = [
+  { name: 'Ahmed Raza', role: 'Strength & Powerlifting', image: '/images/coach-1.jpg' },
+  { name: 'Hassan Ali', role: 'HIIT & Conditioning', image: '/images/coach-2.jpg' },
+  { name: 'Fatima Sheikh', role: 'Combat & Martial Arts', image: '/images/coach-3.jpg' },
 ]
 
-function CoachCard({ coach }) {
-  const [hovered, setHovered] = useState(false)
-  return (
-    <div
-      style={{ overflow: 'hidden', position: 'relative' }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {/* Image container */}
-      <div style={{ overflow: 'hidden', aspectRatio: '3/4', position: 'relative' }}>
-        <img
-          src={coach.img}
-          alt={coach.name}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center top',
-            display: 'block',
-            transition: 'transform 0.65s cubic-bezier(0.25,0.1,0.25,1)',
-            transform: hovered ? 'scale(1.06)' : 'scale(1)',
-          }}
-        />
-        {/* Red hover overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: tokens.colors.accent,
-            opacity: hovered ? 0.2 : 0,
-            transition: 'opacity 0.4s ease',
-            pointerEvents: 'none',
-          }}
-        />
-        {/* Bottom gradient */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(to top, rgba(13,13,13,0.9) 0%, rgba(13,13,13,0.2) 50%, transparent 100%)',
-            pointerEvents: 'none',
-          }}
-        />
-        {/* Coach info overlaid on image */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '24px',
-            left: '24px',
-            right: '24px',
-          }}
-        >
-          <p
-            style={{
-              fontFamily: tokens.fonts.body,
-              fontSize: '0.68rem',
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              color: tokens.colors.accent,
-              margin: '0 0 6px',
-            }}
-          >
-            {coach.specialty}
-          </p>
-          <h3
-            style={{
-              fontFamily: tokens.fonts.display,
-              fontSize: '1.9rem',
-              letterSpacing: '0.04em',
-              color: tokens.colors.secondary,
-              margin: '0 0 8px',
-              lineHeight: 1.05,
-            }}
-          >
-            {coach.name}
-          </h3>
-          <p
-            style={{
-              fontFamily: tokens.fonts.body,
-              fontSize: '0.8125rem',
-              lineHeight: 1.5,
-              color: 'rgba(255,255,255,0.6)',
-              margin: 0,
-              opacity: hovered ? 1 : 0,
-              transform: hovered ? 'translateY(0)' : 'translateY(8px)',
-              transition: 'opacity 0.3s ease, transform 0.3s ease',
-            }}
-          >
-            {coach.bio}
-          </p>
-        </div>
-      </div>
-    </div>
-  )
-}
+export default function Coaches() {
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-100px' })
 
-export function Coaches() {
   return (
     <section
       id="coaches"
-      style={{
-        backgroundColor: tokens.colors.background,
-        padding: 'clamp(80px, 10vw, 120px) clamp(20px, 5vw, 80px)',
-        borderTop: '1px solid rgba(255,255,255,0.05)',
-      }}
+      ref={ref}
+      style={{ padding: 'clamp(7rem,10vw,10rem) 48px' }}
     >
-      <div className="max-w-7xl mx-auto">
-        <SectionReveal>
-          <div style={{ marginBottom: '60px' }}>
-            <p
-              style={{
-                fontFamily: tokens.fonts.body,
-                fontSize: '0.72rem',
-                letterSpacing: '0.38em',
-                textTransform: 'uppercase',
-                color: tokens.colors.accent,
-                marginBottom: '14px',
-              }}
-            >
-              The Experts
-            </p>
-            <h2
-              style={{
-                fontFamily: tokens.fonts.display,
-                fontSize: 'clamp(2.8rem, 5vw, 5rem)',
-                letterSpacing: '0.03em',
-                color: tokens.colors.secondary,
-                margin: 0,
-                lineHeight: 1,
-              }}
-            >
-              MEET YOUR COACHES
-            </h2>
-          </div>
-        </SectionReveal>
+      <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+        <motion.p
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+          style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#E38734', fontWeight: 500, marginBottom: 24 }}
+        >
+          Our Team
+        </motion.p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap: '24px' }}>
-          {COACHES.map((coach, i) => (
-            <SectionReveal key={coach.name} delay={i * 0.12}>
-              <CoachCard coach={coach} />
-            </SectionReveal>
+        <motion.h2
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+          style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: 'clamp(2rem, 4vw, 3.5rem)',
+            fontWeight: 300,
+            lineHeight: 1.1,
+            color: '#fff',
+            marginBottom: 64,
+          }}
+        >
+          Meet your coaches.
+        </motion.h2>
+
+        <div
+          className="coaches-grid"
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}
+        >
+          {coaches.map((coach, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 40 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.7, delay: i * 0.1 }}
+              style={{ cursor: 'pointer' }}
+              className="coach-card"
+            >
+              <div style={{ overflow: 'hidden', aspectRatio: '3/4' }}>
+                <img
+                  src={coach.image}
+                  alt={coach.name}
+                  className="coach-img"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top',
+                    filter: 'grayscale(100%)',
+                    transition: 'filter 0.7s ease, transform 0.7s ease',
+                    display: 'block',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.filter = 'grayscale(0%)'
+                    e.currentTarget.style.transform = 'scale(1.03)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.filter = 'grayscale(100%)'
+                    e.currentTarget.style.transform = 'scale(1)'
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: 24 }}>
+                <h3 style={{ fontSize: 18, fontWeight: 500, color: '#fff', marginBottom: 4 }}>{coach.name}</h3>
+                <p style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#E38734' }}>{coach.role}</p>
+              </div>
+            </motion.div>
           ))}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .coaches-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .coaches-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+      `}</style>
     </section>
   )
 }
