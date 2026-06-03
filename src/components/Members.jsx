@@ -26,11 +26,17 @@ export default function Members() {
   useGSAP(() => {
     gsap.from('.members-sh', {
       opacity: 0, y: 28, duration: 0.85, ease: 'power2.out',
-      scrollTrigger: { trigger: '.members-sh', start: 'top 80%' },
+      scrollTrigger: {
+        trigger: '.members-sh', start: 'top 80%',
+        toggleActions: 'play none none reverse',
+      },
     })
     gsap.from('.mc', {
       y: 30, opacity: 0, stagger: 0.16, duration: 1.0, ease: 'power2.out',
-      scrollTrigger: { trigger: sectionRef.current, start: 'top 72%' },
+      scrollTrigger: {
+        trigger: sectionRef.current, start: 'top 72%',
+        toggleActions: 'play none none reverse',
+      },
     })
   }, { scope: sectionRef })
 

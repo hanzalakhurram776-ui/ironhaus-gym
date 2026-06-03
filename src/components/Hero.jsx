@@ -1,34 +1,7 @@
-import { useRef } from 'react'
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
-
 export default function Hero() {
-  const sectionRef = useRef(null)
-
-  useGSAP(() => {
-    // Disable parallax on mobile — transform/opacity only, never positional on low-end devices
-    const isMobile = window.matchMedia('(max-width: 768px)').matches
-    if (isMobile) return
-
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReduced) return
-
-    gsap.to('#hero-bg img', {
-      yPercent: 18,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 2,
-      },
-    })
-  }, { scope: sectionRef })
-
   return (
     <section
       id="hero-section"
-      ref={sectionRef}
       style={{
         position: 'relative',
         height: '100vh',
@@ -38,7 +11,7 @@ export default function Hero() {
         overflow: 'hidden',
       }}
     >
-      {/* Background */}
+      {/* Background — no ScrollTrigger, scrolls naturally with section */}
       <div id="hero-bg" style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         <img
           src="/images/hero-bg.jpg"
@@ -48,7 +21,6 @@ export default function Hero() {
             objectFit: 'cover', objectPosition: 'center 40%',
             filter: 'grayscale(80%) brightness(0.32) contrast(1.15)',
             transform: 'scale(1.06)',
-            willChange: 'transform',
           }}
         />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)' }} />
@@ -123,8 +95,6 @@ export default function Hero() {
         @media (max-width: 768px) {
           #hero-c     { padding: 0 24px !important; }
           #scroll-ind { right: 20px !important; bottom: 24px !important; }
-          /* No parallax on mobile — release the GPU layer */
-          #hero-bg img { will-change: auto !important; }
         }
       `}</style>
     </section>
