@@ -1,29 +1,23 @@
-import { useEffect, useRef } from 'react'
+import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const WORDS = ['STRENGTH.', 'DISCIPLINE.', 'IDENTITY.']
 
 export default function Intro({ onDone }) {
-  const started = useRef(false)
-
-  useEffect(() => {
-    if (started.current) return
-    started.current = true
-
+  useGSAP(() => {
     document.body.classList.add('locked')
     window.scrollTo(0, 0)
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    gsap.set('#hero-c',    { opacity: 0, y: 28 })
+    gsap.set('#hero-c',     { opacity: 0, y: 28 })
     gsap.set('#scroll-ind', { opacity: 0 })
-    gsap.set('.ws-word',   { opacity: 0, scale: 1.4 })
+    gsap.set('.ws-word',    { opacity: 0, scale: 1.4 })
 
     const finish = () => {
       const overlay = document.getElementById('intro-overlay')
       if (overlay) overlay.style.display = 'none'
-      // Clear will-change now that panels are gone
       const pl = document.getElementById('panel-l')
       const pr = document.getElementById('panel-r')
       if (pl) pl.style.willChange = 'auto'
@@ -34,7 +28,7 @@ export default function Intro({ onDone }) {
     }
 
     if (prefersReduced) {
-      gsap.set('#hero-c',   { opacity: 1, y: 0 })
+      gsap.set('#hero-c',     { opacity: 1, y: 0 })
       gsap.set('#scroll-ind', { opacity: 1 })
       finish()
       return
@@ -53,36 +47,30 @@ export default function Intro({ onDone }) {
       if (pl) pl.style.willChange = 'transform'
       if (pr) pr.style.willChange = 'transform'
     }, null, 1.0)
-    // Subtle screen shake as the door swings
     tl.call(() => {
       gsap.to(document.body, { x: 4, duration: 0.15, yoyo: true, repeat: 1, ease: 'power1.inOut' })
     }, null, 1.05)
     tl.to('#panel-l', { x: '-100%', duration: 2.0, ease: 'power3.inOut' }, 1.05)
     tl.to('#panel-r', { x: '100%',  duration: 2.0, ease: 'power3.inOut' }, 1.05)
-    // Logo + line fade as panels open
     tl.to('#intro-logo', { opacity: 0, duration: 0.38 }, 1.32)
     tl.to('#intro-line',  { opacity: 0, duration: 0.38 }, 1.32)
 
     // Phase 3 — STRENGTH / DISCIPLINE / IDENTITY (automatic, not scroll)
-    // Panels finish at t = 1.05 + 2.0 = 3.05
     tl.to('#ws-w1', { opacity: 1, scale: 1, duration: 0.5, ease: 'expo.out' }, 3.1)
-    tl.to('#ws-w2', { opacity: 1, scale: 1, duration: 0.5, ease: 'expo.out' }, 3.9)   // +0.8 stagger
-    tl.to('#ws-w3', { opacity: 1, scale: 1, duration: 0.5, ease: 'expo.out' }, 4.7)   // +0.8 stagger
-    // IDENTITY finishes at 5.2 — hold 1.5 seconds
+    tl.to('#ws-w2', { opacity: 1, scale: 1, duration: 0.5, ease: 'expo.out' }, 3.9)
+    tl.to('#ws-w3', { opacity: 1, scale: 1, duration: 0.5, ease: 'expo.out' }, 4.7)
     tl.to({}, { duration: 1.5 }, 5.2)
 
-    // Phase 4 — Fade out entire overlay, reveal hero
+    // Phase 4 — Fade out overlay, reveal hero
     tl.to('#intro-overlay', { opacity: 0, duration: 0.8, ease: 'power2.inOut' }, 6.7)
-    tl.to('#hero-c',    { opacity: 1, y: 0, duration: 0.85, ease: 'power2.out' }, 6.7)
-    tl.to('#scroll-ind', { opacity: 1, duration: 0.6 }, 7.1)
-
-    return () => { tl.kill() }
-  }, [onDone])
+    tl.to('#hero-c',        { opacity: 1, y: 0, duration: 0.85, ease: 'power2.out' }, 6.7)
+    tl.to('#scroll-ind',    { opacity: 1, duration: 0.6 }, 7.1)
+  }, { dependencies: [] })
 
   return (
     <div id="intro-overlay" style={{ position: 'fixed', inset: 0, zIndex: 5000 }}>
 
-      {/* Background: about.jpg — the "work" atmosphere for the word sequence */}
+      {/* Background atmosphere for word sequence */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
         <img
           src="/images/about.jpg"
@@ -110,7 +98,7 @@ export default function Intro({ onDone }) {
         background: '#0A0A0A', zIndex: 3,
       }} />
 
-      {/* IRONHAUS + expanding line (fades out as panels open) */}
+      {/* IRONHAUS + expanding line */}
       <div id="intro-c" style={{
         position: 'absolute', inset: 0, zIndex: 5,
         display: 'flex', flexDirection: 'column',

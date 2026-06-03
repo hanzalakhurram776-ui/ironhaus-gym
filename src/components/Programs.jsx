@@ -57,20 +57,22 @@ export default function Programs() {
             onMouseEnter={(e) => {
               e.currentTarget.style.background = '#161616'
               const line = e.currentTarget.querySelector('.pc-line')
-              if (line) line.style.width = '100%'
+              if (line) line.style.transform = 'scaleX(1)'
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = '#131313'
               const line = e.currentTarget.querySelector('.pc-line')
-              if (line) line.style.width = '0'
+              if (line) line.style.transform = 'scaleX(0)'
             }}
           >
-            {/* Red border grows from left on hover — transform only */}
+            {/* Red border grows from left on hover — scaleX transform only, no layout reflow */}
             <div className="pc-line" style={{
               position: 'absolute', bottom: 0, left: 0,
-              height: 1, width: 0,
+              height: 1, width: '100%',
               background: '#8B0000',
-              transition: 'width 0.6s ease',
+              transform: 'scaleX(0)',
+              transformOrigin: 'left',
+              transition: 'transform 0.6s ease',
             }} />
             <div style={{
               fontFamily: "'Bebas Neue', 'Impact', sans-serif",

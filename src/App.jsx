@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
@@ -16,6 +16,7 @@ import Footer       from './components/Footer'
 
 export default function App() {
   const [introDone, setIntroDone] = useState(false)
+  const onIntroDone = useCallback(() => setIntroDone(true), [])
 
   // Lenis: one RAF loop total, driven entirely by GSAP ticker
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function App() {
   return (
     <>
       <GrainOverlay />
-      <Intro onDone={() => setIntroDone(true)} />
+      <Intro onDone={onIntroDone} />
       <Nav />
       <main>
         <Hero />

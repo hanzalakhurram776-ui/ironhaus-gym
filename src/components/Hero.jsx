@@ -123,6 +123,8 @@ export default function Hero() {
         @media (max-width: 768px) {
           #hero-c     { padding: 0 24px !important; }
           #scroll-ind { right: 20px !important; bottom: 24px !important; }
+          /* No parallax on mobile — release the GPU layer */
+          #hero-bg img { will-change: auto !important; }
         }
       `}</style>
     </section>

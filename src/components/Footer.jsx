@@ -1,91 +1,59 @@
-import { tokens } from '../tokens'
+import { memo } from 'react'
 
-const LINKS = ['Training', 'Coaches', 'Pricing', 'Join']
-
-export function Footer() {
+function Footer() {
   return (
     <footer
+      id="footer"
       style={{
-        backgroundColor: '#080808',
-        borderTop: '1px solid rgba(255,255,255,0.05)',
-        padding: 'clamp(40px, 5vw, 56px) clamp(20px, 5vw, 80px)',
+        background: '#000',
+        padding: '58px 8vw 38px',
+        textAlign: 'center',
+        borderTop: '1px solid rgba(139,0,0,0.07)',
       }}
     >
-      <div className="max-w-7xl mx-auto">
-        <div
-          className="flex flex-col md:flex-row md:items-center md:justify-between"
-          style={{ gap: '28px', marginBottom: '32px' }}
-        >
-          <span
-            style={{
-              fontFamily: tokens.fonts.display,
-              fontSize: '1.6rem',
-              letterSpacing: '0.1em',
-              color: tokens.colors.secondary,
-            }}
-          >
-            IRONHAUS
-          </span>
-
-          <nav className="flex flex-wrap" style={{ gap: '28px' }}>
-            {LINKS.map((link) => (
-              <FooterLink key={link} href={`#${link.toLowerCase()}`} label={link} />
-            ))}
-          </nav>
-        </div>
-
-        <div
-          style={{
-            borderTop: '1px solid rgba(255,255,255,0.06)',
-            paddingTop: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '6px',
-          }}
-        >
-          <p
-            style={{
-              fontFamily: tokens.fonts.body,
-              fontSize: '0.8rem',
-              color: 'rgba(255,255,255,0.25)',
-              margin: 0,
-            }}
-          >
-            © {new Date().getFullYear()} IRONHAUS Training Facility. All rights reserved.
-          </p>
-          <p
-            style={{
-              fontFamily: tokens.fonts.body,
-              fontSize: '0.75rem',
-              color: 'rgba(255,255,255,0.15)',
-              margin: 0,
-            }}
-          >
-            Results require dedication, consistency, and hard work. Individual results may vary.
-          </p>
-        </div>
+      <div style={{
+        fontFamily: "'Bebas Neue', 'Impact', sans-serif",
+        fontSize: '1.25rem', letterSpacing: '0.16em',
+        color: 'rgba(139,0,0,0.42)',
+        marginBottom: 10,
+      }}>
+        IRONHAUS
       </div>
+      <div style={{
+        width: 40, height: 1,
+        background: 'rgba(139,0,0,0.28)',
+        margin: '0 auto 26px',
+      }} />
+      <p style={{
+        fontSize: '10.5px', fontWeight: 300,
+        letterSpacing: '0.2em', textTransform: 'uppercase',
+        color: 'rgba(240,237,232,0.16)',
+        marginBottom: 9,
+      }}>
+        DHA Phase 5 &middot; Lahore &middot; Pakistan
+      </p>
+      <p style={{
+        fontSize: 11, fontWeight: 300, letterSpacing: '0.06em',
+        color: 'rgba(240,237,232,0.11)',
+        marginBottom: 42,
+      }}>
+        ironhaus@ironhaus.pk &nbsp;&middot;&nbsp; +92 300 000 0000
+      </p>
+      <p style={{
+        fontSize: 9, fontWeight: 300,
+        letterSpacing: '0.16em', textTransform: 'uppercase',
+        color: 'rgba(240,237,232,0.07)',
+      }}>
+        &copy; 2026 IRONHAUS. All rights reserved.
+      </p>
+
+      <style>{`
+        @media (max-width: 768px) {
+          #footer { padding: 46px 24px 32px !important; }
+        }
+      `}</style>
     </footer>
   )
 }
 
-function FooterLink({ href, label }) {
-  return (
-    <a
-      href={href}
-      style={{
-        fontFamily: tokens.fonts.body,
-        fontSize: '0.8125rem',
-        letterSpacing: '0.06em',
-        textTransform: 'uppercase',
-        color: 'rgba(255,255,255,0.35)',
-        textDecoration: 'none',
-        transition: 'color 0.2s',
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.color = tokens.colors.secondary)}
-      onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.35)')}
-    >
-      {label}
-    </a>
-  )
-}
+export default memo(Footer)
