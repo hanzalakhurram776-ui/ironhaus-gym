@@ -1,53 +1,61 @@
-import { useEffect } from 'react'
-import Lenis from 'lenis'
+import { useState, useEffect } from 'react'
 import gsap from 'gsap'
-import ScrollTrigger from 'gsap/ScrollTrigger'
-import './App.css'
-import { tokens } from './tokens'
-import { CustomCursor } from './components/CustomCursor'
-import { Nav } from './components/Nav'
-import { Hero } from './components/Hero'
-import { Stats } from './components/Stats'
-import { Training } from './components/Training'
-import { Coaches } from './components/Coaches'
-import { Pricing } from './components/Pricing'
-import { Join } from './components/Join'
-import { Footer } from './components/Footer'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Lenis from 'lenis'
 
-gsap.registerPlugin(ScrollTrigger)
+import GrainOverlay from './components/GrainOverlay'
+import Intro        from './components/Intro'
+import Nav          from './components/Nav'
+import Hero         from './components/Hero'
+import Members      from './components/Members'
+import Programs     from './components/Programs'
+import Membership   from './components/Membership'
+import TheFloor     from './components/TheFloor'
+import EnterCTA     from './components/EnterCTA'
+import Footer       from './components/Footer'
 
-function App() {
+export default function App() {
+  const [introDone, setIntroDone] = useState(false)
+
+  // Lenis: one RAF loop total, driven entirely by GSAP ticker
   useEffect(() => {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduced) return
+    if (!introDone) return
 
-    const lenis = new Lenis()
-    lenis.on('scroll', ScrollTrigger.update)
-    const raf = (time) => lenis.raf(time * 1000)
-    gsap.ticker.add(raf)
+    const lenis = new Lenis({
+      duration: 2.0,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      autoRaf: false,
+    })
+
+    const onScroll = () => ScrollTrigger.update()
+    lenis.on('scroll', onScroll)
+
+    const rafFn = (time) => lenis.raf(time * 1000)
+    gsap.ticker.add(rafFn)
     gsap.ticker.lagSmoothing(0)
+    ScrollTrigger.refresh()
 
     return () => {
-      gsap.ticker.remove(raf)
+      lenis.off('scroll', onScroll)
+      gsap.ticker.remove(rafFn)
       lenis.destroy()
     }
-  }, [])
+  }, [introDone])
 
   return (
-    <div style={{ backgroundColor: tokens.colors.background, fontFamily: tokens.fonts.body }}>
-      <CustomCursor />
+    <>
+      <GrainOverlay />
+      <Intro onDone={() => setIntroDone(true)} />
       <Nav />
       <main>
         <Hero />
-        <Stats />
-        <Training />
-        <Coaches />
-        <Pricing />
-        <Join />
+        <Members />
+        <Programs />
+        <Membership />
+        <TheFloor />
+        <EnterCTA />
       </main>
       <Footer />
-    </div>
+    </>
   )
 }
-
-export default App

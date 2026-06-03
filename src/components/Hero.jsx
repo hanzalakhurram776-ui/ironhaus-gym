@@ -1,247 +1,130 @@
-import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
-import * as THREE from 'three'
-import { tokens } from '../tokens'
-import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useRef } from 'react'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
 
-const HEADLINE = ['FORGE', 'YOUR', 'LIMITS.']
+export default function Hero() {
+  const sectionRef = useRef(null)
 
-function HeroBtn({ href, children }) {
-  const [h, setH] = useState(false)
-  return (
-    <a
-      href={href}
-      style={{
-        fontFamily: tokens.fonts.body,
-        fontSize: '0.82rem',
-        letterSpacing: '0.14em',
-        textTransform: 'uppercase',
-        color: tokens.colors.secondary,
-        backgroundColor: h ? tokens.colors.accentHover : tokens.colors.accent,
-        padding: '16px 44px',
-        textDecoration: 'none',
-        display: 'inline-block',
-        transition: 'background-color 0.2s, box-shadow 0.2s',
-        boxShadow: h ? tokens.colors.accentGlow : 'none',
-      }}
-      onMouseEnter={() => setH(true)}
-      onMouseLeave={() => setH(false)}
-    >
-      {children}
-    </a>
-  )
-}
+  useGSAP(() => {
+    // Disable parallax on mobile — transform/opacity only, never positional on low-end devices
+    const isMobile = window.matchMedia('(max-width: 768px)').matches
+    if (isMobile) return
 
-export function Hero() {
-  const canvasRef = useRef(null)
-  const reduced = useReducedMotion()
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReduced) return
 
-  useEffect(() => {
-    if (reduced || !canvasRef.current) return
-
-    const canvas = canvasRef.current
-    const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 100)
-    camera.position.z = 5
-
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false)
-    renderer.setClearColor(0x000000, 0)
-
-    const geo = new THREE.IcosahedronGeometry(tokens.three.radius, tokens.three.detail)
-    const mat = new THREE.MeshBasicMaterial({
-      color: tokens.three.color,
-      wireframe: true,
-      opacity: 0.85,
-      transparent: true,
+    gsap.to('#hero-bg img', {
+      yPercent: 18,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 2,
+      },
     })
-    const mesh = new THREE.Mesh(geo, mat)
-    scene.add(mesh)
-
-    let baseX = 0
-    let baseY = 0
-    let mouseX = 0
-    let mouseY = 0
-
-    const onMouseMove = (e) => {
-      mouseX = (e.clientX / window.innerWidth - 0.5) * 2
-      mouseY = (e.clientY / window.innerHeight - 0.5) * 2
-    }
-    window.addEventListener('mousemove', onMouseMove, { passive: true })
-
-    let animId
-    const animate = () => {
-      animId = requestAnimationFrame(animate)
-      baseX += 0.003
-      baseY += 0.005
-      mesh.rotation.x = baseX + mouseY * 0.18
-      mesh.rotation.y = baseY + mouseX * 0.18
-      renderer.render(scene, camera)
-    }
-    animate()
-
-    const onResize = () => {
-      const w = canvas.clientWidth
-      const h = canvas.clientHeight
-      renderer.setSize(w, h, false)
-      camera.aspect = w / h
-      camera.updateProjectionMatrix()
-    }
-    window.addEventListener('resize', onResize)
-
-    return () => {
-      cancelAnimationFrame(animId)
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('resize', onResize)
-      geo.dispose()
-      mat.dispose()
-      renderer.dispose()
-    }
-  }, [reduced])
+  }, { scope: sectionRef })
 
   return (
     <section
-      id="hero"
+      id="hero-section"
+      ref={sectionRef}
       style={{
         position: 'relative',
-        minHeight: '100svh',
+        height: '100vh',
+        minHeight: 600,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
         overflow: 'hidden',
       }}
     >
-      {/* Background image */}
-      <img
-        src={tokens.images.hero}
-        alt=""
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center',
-          zIndex: 0,
-        }}
-      />
-
-      {/* Dark overlay */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundColor: tokens.colors.overlay,
-          zIndex: 1,
-        }}
-      />
-
-      {/* Three.js wireframe canvas */}
-      {!reduced && (
-        <canvas
-          ref={canvasRef}
+      {/* Background */}
+      <div id="hero-bg" style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <img
+          src="/images/hero-bg.jpg"
+          alt=""
           style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 2,
-            pointerEvents: 'none',
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center 40%',
+            filter: 'grayscale(80%) brightness(0.32) contrast(1.15)',
+            transform: 'scale(1.06)',
+            willChange: 'transform',
           }}
         />
-      )}
-
-      {/* Content */}
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 3,
-          textAlign: 'center',
-          padding: 'clamp(80px,10vw,120px) clamp(20px,5vw,60px) clamp(60px,8vw,80px)',
-          maxWidth: '960px',
-          width: '100%',
-        }}
-      >
-        <motion.p
-          initial={reduced ? {} : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: tokens.animation.ease }}
-          style={{
-            fontFamily: tokens.fonts.body,
-            fontSize: '0.72rem',
-            letterSpacing: '0.4em',
-            textTransform: 'uppercase',
-            color: tokens.colors.accent,
-            marginBottom: '24px',
-          }}
-        >
-          Premium Training Facility
-        </motion.p>
-
-        <h1
-          style={{
-            fontFamily: tokens.fonts.display,
-            fontSize: 'clamp(4.5rem, 14vw, 13rem)',
-            lineHeight: 0.92,
-            color: tokens.colors.secondary,
-            margin: '0 0 36px',
-            letterSpacing: '0.02em',
-          }}
-        >
-          {HEADLINE.map((word, i) => (
-            <motion.span
-              key={word}
-              initial={reduced ? {} : { opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.45 + i * 0.14, ease: [0.16, 1, 0.3, 1] }}
-              style={{ display: 'inline-block', marginRight: '0.18em' }}
-            >
-              {word}
-            </motion.span>
-          ))}
-        </h1>
-
-        <motion.p
-          initial={reduced ? {} : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.95, ease: tokens.animation.ease }}
-          style={{
-            fontFamily: tokens.fonts.body,
-            fontSize: 'clamp(1rem, 2vw, 1.125rem)',
-            lineHeight: 1.7,
-            color: tokens.colors.textMuted,
-            maxWidth: '520px',
-            margin: '0 auto 40px',
-          }}
-        >
-          Where elite athletes are forged. IRONHAUS combines science-backed
-          programming with world-class coaching to push you past every limit.
-        </motion.p>
-
-        <motion.div
-          initial={reduced ? {} : { opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 1.15, ease: tokens.animation.ease }}
-        >
-          <HeroBtn href="#join">Join IRONHAUS</HeroBtn>
-        </motion.div>
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)' }} />
       </div>
 
-      {/* Bottom fade to page background */}
+      {/* Content — opacity 0, revealed by Intro timeline */}
       <div
+        id="hero-c"
         style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '180px',
-          background: `linear-gradient(to top, ${tokens.colors.background} 0%, transparent 100%)`,
-          zIndex: 3,
-          pointerEvents: 'none',
+          position: 'relative', zIndex: 10,
+          padding: '0 8vw',
+          willChange: 'transform, opacity',
         }}
-      />
+      >
+        <span style={{
+          display: 'block',
+          fontSize: 9, fontWeight: 300,
+          textTransform: 'uppercase', letterSpacing: '0.35em',
+          color: '#8B0000', marginBottom: 24,
+        }}>
+          EST. 2019 &middot; LAHORE
+        </span>
+        <h1 style={{
+          fontFamily: "'Bebas Neue', 'Impact', sans-serif",
+          fontSize: 'clamp(5rem, 12vw, 11rem)',
+          letterSpacing: '0.04em',
+          color: '#F0EDE8',
+          lineHeight: 0.9,
+          marginBottom: 28,
+        }}>
+          THE HOUSE<br />OF IRON.
+        </h1>
+        <p style={{
+          fontSize: 13, fontWeight: 300,
+          color: 'rgba(240,237,232,0.36)',
+          letterSpacing: '0.06em',
+        }}>
+          Where the decision was already made.
+        </p>
+      </div>
+
+      {/* Scroll indicator — bottom right, revealed by Intro */}
+      <div
+        id="scroll-ind"
+        style={{
+          position: 'absolute', bottom: 40, right: 48,
+          zIndex: 10,
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+        }}
+      >
+        <div style={{
+          width: 1, height: 58,
+          background: 'rgba(240,237,232,0.1)',
+          position: 'relative', overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute', top: -12, left: 0,
+            width: 1, height: 12,
+            background: '#8B0000',
+            animation: 'pip 2.2s ease-in-out infinite',
+          }} />
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes pip {
+          0%   { top: -12px; opacity: 0; }
+          10%  { opacity: 1; }
+          80%  { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+        @media (max-width: 768px) {
+          #hero-c     { padding: 0 24px !important; }
+          #scroll-ind { right: 20px !important; bottom: 24px !important; }
+        }
+      `}</style>
     </section>
   )
 }
